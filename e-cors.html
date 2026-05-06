@@ -1,92 +1,49 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Eitaa Raw File Request</title>
-    <style>
-        body { font-family: monospace; padding: 20px; }
-        input { width: 100%; margin-bottom: 10px; }
-        button { padding: 10px; cursor: pointer; }
-        pre { background: #111; color: #0f0; padding: 10px; overflow:auto; }
-    </style>
-</head>
 <body>
 
-<h2>Raw Eitaa File Request Tester</h2>
+<h2>Eitaa File Debug Tester</h2>
 
-<label>File ID:</label>
-<input id="file" value="151300_69fae370d5bcf_1048">
-
-<label>Ticket:</label>
-<input id="ticket" value="490188">
-
-<label>Message:</label>
-<input id="message" value="1098604">
-
-<button onclick="send()">Send Request</button>
+<button onclick="run()">Send Request</button>
 
 <pre id="out"></pre>
 
 <script>
 
-// 🔥 COOKIE HARDCODED (همونی که دادی)
-const COOKIE = "myeitaa_session=eyJpdiI6IkdVdDFNUXZBcXI1b1RkeVJFRGFzYXc9PSIsInZhbHVlIjoieWg5UEg0YlYrOW9tMGpSQm9GbzF2eDhnbHlsYzVLTWlDV0tDd2xuY3hEcmR4enN6ZTRyV044dUtUSWxuUUpwQXMrcGhsVk5ucXBwSjlWT0hVZ0J4Q1l1RC9JQlRVemJycGNBaStJRTlNSkp6NVFpMi9RZGUrLzFUNEVNcUE0N2UiLCJtYWMiOiJmNTE3MzM1YzY5N2Y4OTVhZmRlNDhiNWM4NDExMDllNzM4ZTc5MDBjMDZmODI1ODBjNjZiNzJlZWNhYmM0MzZiIiwidGFnIjoiIn0%3D";
+async function run() {
 
-async function send() {
-
-    const file = document.getElementById("file").value.trim();
-    const ticket = document.getElementById("ticket").value.trim();
-    const message = document.getElementById("message").value.trim();
-
-    const url = `https://my.eitaa.com/api/v1/file/show/${file}?ticket=${ticket}&message=${message}`;
+    const url = "https://my.eitaa.com/api/v1/file/show/151300_69fae370d5bcf_1048?ticket=490188&message=1098604";
 
     try {
 
         const res = await fetch(url, {
             method: "GET",
-
-            headers: {
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "User-Agent": navigator.userAgent,
-
-                // ⚠️ مرورگر معمولاً اینو ignore می‌کنه
-                "Cookie": COOKIE
-            },
-
             credentials: "include"
         });
 
-        let output = "";
+        let out = "";
 
-        output += "REQUEST URL:\n" + url + "\n\n";
-        output += "STATUS: " + res.status + "\n\n";
+        out += "STATUS: " + res.status + "\n\n";
 
-        output += "=== RESPONSE HEADERS ===\n";
+        out += "URL: " + url + "\n\n";
+
+        out += "HEADERS SENT BY BROWSER:\n";
+        out += "- Cookie: (automatic if available)\n";
+        out += "- Origin: " + location.origin + "\n\n";
+
+        out += "RESPONSE HEADERS:\n";
+
         res.headers.forEach((v, k) => {
-            output += k + ": " + v + "\n";
+            out += k + ": " + v + "\n";
         });
 
-        const ct = res.headers.get("content-type");
+        out += "\nRESPONSE BODY:\n";
+        out += await res.text();
 
-        output += "\n=== RESPONSE BODY ===\n";
-
-        if (ct && ct.includes("pdf")) {
-
-            const blob = await res.blob();
-
-            output += "PDF RECEIVED\n";
-            output += "Size: " + blob.size + " bytes\n";
-
-        } else {
-
-            const text = await res.text();
-            output += text;
-
-        }
-
-        document.getElementById("out").innerText = output;
+        document.getElementById("out").innerText = out;
 
     } catch (e) {
-        document.getElementById("out").innerText = "ERROR:\n" + e;
+        document.getElementById("out").innerText = e;
     }
 }
 
