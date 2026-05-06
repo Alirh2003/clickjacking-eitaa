@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eitaa VerifyCode CORS Tester</title>
+    <title>Eitaa loginByEitaa CORS Tester</title>
     <style>
         body { font-family: monospace; padding: 20px; }
         input, textarea { width: 100%; margin-bottom: 10px; }
@@ -11,15 +11,12 @@
 </head>
 <body>
 
-<h2>Eitaa /verifyCode CORS Test</h2>
+<h2>Raw loginByEitaa CORS Tester</h2>
 
-<p>Reply Code:</p>
-<input id="reply_code" placeholder="reply_code">
+<p>Phone:</p>
+<input id="phone" value="09373371480">
 
-<p>Code:</p>
-<input id="code" placeholder="code">
-
-<p>Optional Origin (for testing spoof behavior):</p>
+<p>Optional Origin:</p>
 <input id="origin" value="https://alirh2003.github.io">
 
 <button onclick="send()">Send Request</button>
@@ -30,15 +27,13 @@
 
 async function send() {
 
-    const reply_code = document.getElementById("reply_code").value;
-    const code = document.getElementById("code").value;
+    const phone = document.getElementById("phone").value;
     const origin = document.getElementById("origin").value;
 
-    const url = "https://my.eitaa.com/api/v1/verifyCode";
+    const url = "https://my.eitaa.com/api/v1/loginByEitaa";
 
     const payload = {
-        reply_code: reply_code,
-        code: code
+        phone: phone
     };
 
     try {
@@ -72,7 +67,7 @@ async function send() {
     } catch (e) {
 
         document.getElementById("out").innerText =
-            "ERROR (likely CORS blocked):\n" + e;
+            "CORS BLOCKED / NETWORK ERROR:\n" + e;
     }
 }
 
