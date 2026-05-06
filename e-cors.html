@@ -1,66 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eitaa CORS Tester</title>
+    <title>Eitaa File Show Request</title>
     <style>
         body { font-family: monospace; padding: 20px; }
-        input, textarea { width: 100%; margin-bottom: 10px; }
+        input { width: 100%; margin-bottom: 10px; }
         button { padding: 10px; cursor: pointer; }
         pre { background: #111; color: #0f0; padding: 10px; overflow:auto; }
     </style>
 </head>
 <body>
 
-<h2>Raw CORS Request Tester (Eitaa)</h2>
+<h2>Eitaa File Show Request Tester</h2>
 
-<label>Ticket ID:</label>
+<label>File ID:</label>
+<input id="file" value="151300_69fae370d5bcf_1048">
+
+<label>Ticket:</label>
 <input id="ticket" value="490188">
 
-<label>Session Cookie:</label>
-<textarea id="cookie">myeitaa_session=PUT_YOUR_COOKIE_HERE</textarea>
+<label>Message:</label>
+<input id="message" value="1098604">
 
-<button onclick="sendReq()">Send Request</button>
+<button onclick="send()">Send Request</button>
 
 <pre id="out"></pre>
 
 <script>
-async function sendReq() {
+async function send() {
 
-    const ticketId = document.getElementById("ticket").value.trim();
-    const cookie = document.getElementById("cookie").value.trim();
+    const file = document.getElementById("file").value;
+    const ticket = document.getElementById("ticket").value;
+    const message = document.getElementById("message").value;
 
-    const url = `https://my.eitaa.com/api/v1/ticket/show/${ticketId}`;
+    const url = `https://my.eitaa.com/api/v1/file/show/${file}?ticket=${ticket}&message=${message}`;
 
     try {
 
         const res = await fetch(url, {
-            method: "POST",
+            method: "GET",
+            credentials: "include",
             headers: {
-                "Accept": "application/json, text/plain, */*",
-                "Content-Type": "application/json",
-                "Origin": "https://my.eitaa.com",
-                "Cookie": cookie
-            },
-            credentials: "include"
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            }
         });
 
-        const text = await res.text();
+        let output = "";
 
-        let output =
-            "STATUS: " + res.status + "\n\n" +
-            "RESPONSE HEADERS:\n";
+        output += "STATUS: " + res.status + "\n\n";
 
+        output += "=== RESPONSE HEADERS ===\n";
         res.headers.forEach((v, k) => {
             output += k + ": " + v + "\n";
         });
 
-        output += "\nRESPONSE BODY:\n" + text;
+        output += "\n=== RESPONSE BODY ===\n";
+
+        const contentType = res.headers.get("content-type");
+
+        if (contentType && contentType.includes("pdf")) {
+
+            const blob = await res.blob();
+            output += "PDF FILE RECEIVED\n";
+            output += "Size: " + blob.size + " bytes\n";
+
+        } else {
+
+            const text = await res.text();
+            output += text;
+
+        }
 
         document.getElementById("out").innerText = output;
 
     } catch (e) {
-        document.getElementById("out").innerText =
-            "ERROR:\n" + e;
+        document.getElementById("out").innerText = "ERROR:\n" + e;
     }
 }
 </script>
